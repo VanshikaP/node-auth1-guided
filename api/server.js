@@ -18,7 +18,7 @@ const sessionConfig = {
     httpOnly: true, // true means no access from JS
   },
   resave: false,
-  saveUnitialized: true // GDPR laws require to check with client
+  saveUninitialized: true // GDPR laws require to check with client
 };
 
 server.use(helmet());
