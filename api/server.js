@@ -2,10 +2,12 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 const session = require('express-session');
+const knexStore = require('connect-session-knex')(session); //remember to carry and pass the session
 
 const usersRouter = require("../users/users-router.js");
 const authRouter = require('../auth/auth-router.js');
 const restricted = require('../auth/restricted-middleware.js');
+const knex = require('../database/dbConfig.js'); // needed for storing session in the database
 
 const server = express();
 
@@ -18,7 +20,15 @@ const sessionConfig = {
     httpOnly: true, // true means no access from JS
   },
   resave: false,
-  saveUninitialized: true // GDPR laws require to check with client
+  saveUninitialized: true, // GDPR laws require to check with client
+  // remember the new keyword
+  store: new knexStore({
+    knex,
+    tablename: 'sessions',
+    createtable: true,
+    sidfieldname: 'sid',
+    clearInterval: 1000 * 60 * 15,
+  })
 };
 
 server.use(helmet());
