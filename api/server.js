@@ -1,8 +1,6 @@
 const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
-const session = require('express-session');
-const knexStore = require('connect-session-knex')(session); //remember to carry and pass the session
 
 const usersRouter = require("../users/users-router.js");
 const authRouter = require('../auth/auth-router.js');
@@ -11,30 +9,9 @@ const knex = require('../database/dbConfig.js'); // needed for storing session i
 
 const server = express();
 
-const sessionConfig = {
-  name: 'cookie monster',
-  secret: 'keep it secret, keep it safe!',
-  cookie: {
-    maxAge:  1000 * 60 * 60,
-    secure: false, // true in prod to send only over https
-    httpOnly: true, // true means no access from JS
-  },
-  resave: false,
-  saveUninitialized: true, // GDPR laws require to check with client
-  // remember the new keyword
-  store: new knexStore({
-    knex,
-    tablename: 'sessions',
-    createtable: true,
-    sidfieldname: 'sid',
-    clearInterval: 1000 * 60 * 15,
-  })
-};
-
 server.use(helmet());
 server.use(express.json());
 server.use(cors());
-server.use(session(sessionConfig));
 
 server.use("/api/users", restricted, usersRouter);
 server.use('/api/auth', authRouter);
